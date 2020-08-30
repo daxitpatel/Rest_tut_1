@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt import JWT, jwt_required
 
@@ -10,6 +10,18 @@ from item import Item, ItemList
 app = Flask(__name__)
 app.secret_key = 'y48937yurhn4375y8934utuj'
 jwt = JWT(app, authenticate, identity)
+
+@jwt.auth_response_handler
+def custom_response_handler(access_token,identity):
+	print(identity) #user.User class object for current user.. boom
+	return jsonify({
+			'access_token' : access_token.decode('utf-8'),
+			'id' : identity.id,
+			'username' : identity.username,
+			'password' : identity.password
+		})
+
+
 
 api = Api(app)
 api.add_resource(UserRegister, '/register')
